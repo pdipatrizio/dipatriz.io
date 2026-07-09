@@ -1,17 +1,341 @@
 ---
+import Layout from '../layouts/Layout.astro';
 
+const skillGroups = [
+	{
+		name: 'Languages and frameworks',
+		skills: [
+			'PHP',
+			'Laravel',
+			'JavaScript',
+			'Alpine.js',
+			'HTML',
+			'CSS',
+			'Tailwind CSS',
+			'SQL',
+			'Python',
+			'PyQt',
+		],
+	},
+	{
+		name: 'CMS and e-commerce',
+		skills: [
+			'Statamic',
+			'WordPress custom plugins and themes',
+			'WooCommerce',
+			'Content modeling',
+		],
+	},
+	{
+		name: 'Performance',
+		skills: [
+			'Core Web Vitals',
+			'LCP optimization',
+			'Lazy loading',
+			'Third party script deferral',
+			'Caching strategies',
+			'Server migrations',
+			'PageSpeed Insights',
+		],
+	},
+	{
+		name: 'Analytics and attribution',
+		skills: [
+			'GA4 custom events and reports',
+			'Full GTM container builds',
+			'First touch attribution',
+			'Salesforce integration',
+			'A/B testing with VWO and Optimizely',
+			'CRO',
+		],
+	},
+	{
+		name: 'Technical SEO',
+		skills: [
+			'JSON-LD structured data',
+			'XML sitemaps',
+			'Canonical URLs',
+			'301 redirect strategy',
+			'Crawlability and indexation',
+		],
+	},
+	{
+		name: 'Tools and practices',
+		skills: [
+			'Git',
+			'Vite',
+			'Webpack',
+			'Jenkins CI',
+			'AWS S3',
+			'MySQL',
+			'Figma',
+			'BrowserStack',
+			'Test driven development',
+			'Paired programming',
+			'AI assisted development with Claude Code and Cursor',
+		],
+	},
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout
+	title="Philip DiPatrizio | Senior Web Developer in Ann Arbor, MI"
+	description="Senior web developer in Ann Arbor, Michigan focused on performance, frontend engineering, and analytics. Measured PageSpeed turnarounds, production Laravel and Statamic builds, and conversion optimization."
+>
+	<main class="mx-auto max-w-3xl px-6">
+		<!-- Hero -->
+		<header class="pt-20 pb-16 sm:pt-28">
+			<p class="font-pixel text-[10px] tracking-wider text-cyan3d uppercase">
+				Ann Arbor, Michigan
+			</p>
+			<h1
+				class="text-anaglyph mt-6 font-pixel text-2xl leading-relaxed text-white sm:text-4xl sm:leading-relaxed"
+			>
+				Philip DiPatrizio
+			</h1>
+			<p class="mt-4 text-lg font-bold">
+				Senior web developer who owns the outcome.<span
+					class="animate-blink text-cyan3d">▮</span
+				>
+			</p>
+			<p class="mt-6 max-w-2xl leading-relaxed text-ink-dim">
+				I build and run websites end to end. My specialty is web performance,
+				backed by measured turnarounds, and I bring career-long depth in analytics,
+				technical SEO, and conversion optimization.
+			</p>
+			<div class="mt-10 flex flex-wrap gap-5">
+				<a
+					href="mailto:pdipatrizio@gmail.com"
+					class="shadow-anaglyph-sm border-2 border-white bg-cyan3d px-5 py-3 font-pixel text-[10px] text-crt transition hover:translate-y-0.5 hover:bg-white"
+				>
+					EMAIL ME
+				</a>
+				<a
+					href="https://www.linkedin.com/in/philipdipatrizio"
+					class="border-2 border-grid bg-panel px-5 py-3 font-pixel text-[10px] text-ink transition hover:translate-y-0.5 hover:border-cyan3d hover:text-cyan3d"
+				>
+					LINKEDIN
+				</a>
+			</div>
+		</header>
+
+		<!-- Experience -->
+		<section aria-labelledby="experience-heading" class="border-t-2 border-grid py-16">
+			<h2
+				id="experience-heading"
+				class="text-anaglyph-sm font-pixel text-base leading-relaxed text-white sm:text-lg"
+			>
+				<span class="text-cyan3d">&gt;</span> Experience
+			</h2>
+
+			<article class="mt-10">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+					<h3 class="font-pixel text-xs leading-relaxed text-white">
+						Senior Web Developer, Raken
+					</h3>
+					<p class="text-sm text-ink-dim">2022 – 2025</p>
+				</div>
+				<p class="mt-3 leading-relaxed">
+					Sole developer and owner of rakenapp.com, a custom Laravel and Statamic
+					application, with over 1,100 commits across three years.
+				</p>
+				<ul class="mt-4 list-[square] space-y-2 pl-5 text-sm leading-relaxed text-ink-dim marker:text-cyan3d">
+					<li>
+						Developed custom Laravel controllers and services, including a cached
+						integration with Raken's product API with typed error handling, an
+						application health check endpoint, and server side PDF generation.
+					</li>
+					<li>
+						Raised mobile PageSpeed performance scores from about 20 to about 90
+                        through Core Web Vitals and LCP work, dynamic component loading, and
+                        lazy loading third party scripts until user interaction.
+					</li>
+					<li>
+						Ran a conversion optimization program with VWO, including a "choose
+						your own adventure" lead form that greatly increased conversions and
+                        was rolled out to nearly every landing page.
+					</li>
+					<li>
+						Architected the full GA4 and Google Tag Manager setup, custom events with
+						rich lead parameters, conversion points, and first touch attribution
+						passed through to Salesforce.
+					</li>
+				</ul>
+			</article>
+
+			<article class="mt-12">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+					<h3 class="font-pixel text-xs leading-relaxed text-white">
+						Software Developer, Menlo Innovations
+					</h3>
+					<p class="text-sm text-ink-dim">2026</p>
+				</div>
+				<p class="mt-3 leading-relaxed">
+					Paired on CAVA, a NASA funded desktop application that scientists use to
+					process and visualize data from the IMAP mission, ramping on Python and
+					PyQt from zero in a rigorous test driven, paired programming shop.
+				</p>
+				<ul class="mt-4 list-[square] space-y-2 pl-5 text-sm leading-relaxed text-ink-dim marker:text-cyan3d">
+					<li>
+						Contributed to a paired 8x rendering speedup for a data selection modal
+						by replacing tens of thousands of standard widgets with custom QPainter
+						drawing.
+					</li>
+					<li>Redesigned the app's Mapping Tool, including collapsible side panels.</li>
+					<li>
+						Practiced test driven development and AI assisted pairing workflows on a
+						production codebase every day.
+					</li>
+				</ul>
+			</article>
+
+			<article class="mt-12">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+					<h3 class="font-pixel text-xs leading-relaxed text-white">
+						Full Stack Web Developer, Backyard Products
+					</h3>
+					<p class="text-sm text-ink-dim">2021 – 2022</p>
+				</div>
+				<p class="mt-3 leading-relaxed">
+					The deliberate first step in my shift from digital leadership into full
+					time development, doing custom WordPress and WooCommerce engineering for
+					high traffic e-commerce and marketing sites.
+				</p>
+				<ul class="mt-4 list-[square] space-y-2 pl-5 text-sm leading-relaxed text-ink-dim marker:text-cyan3d">
+					<li>
+						Engineered and launched custom responsive WordPress themes and plugins.
+					</li>
+					<li>
+						Developed complex WooCommerce functionality, including regional pricing
+						engines, location based content detection, and advanced product
+						variation options.
+					</li>
+					<li>
+						Built a browser geolocation gate with a zip code confirmation step that
+						showed purchasable shed installation only to visitors in eligible
+						regions.
+					</li>
+					<li>
+						Kept Core Web Vitals passing site wide and verified rendering across
+						browsers and devices.
+					</li>
+				</ul>
+			</article>
+
+			<article class="mt-10">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+					<h3 class="font-pixel text-xs leading-relaxed text-white">
+						Web Developer and Partner, Digital Engine
+					</h3>
+					<p class="text-sm text-ink-dim">2019 – 2021</p>
+				</div>
+				<p class="mt-3 text-sm leading-relaxed text-ink-dim">
+					One third partner in a small agency. Designed, built, and launched client
+					websites with a mobile first focus, handled server setup and management,
+					and engineered a server migration to OpenLiteSpeed that took a high
+					traffic client's mobile PageSpeed from about 17 to about 80.
+				</p>
+			</article>
+
+			<article class="mt-8">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+					<h3 class="font-pixel text-xs leading-relaxed text-white">
+						Director of Digital Marketing and Web Dev, Forward Thinking Systems
+					</h3>
+					<p class="text-sm text-ink-dim">2016 – 2020</p>
+				</div>
+				<p class="mt-3 text-sm leading-relaxed text-ink-dim">
+					Designed, built, and maintained all company websites, linked Google
+					Analytics and Salesforce for full funnel attribution back to offline
+					sales, and led technical SEO and performance strategy through over 500%
+					growth in organic traffic.
+				</p>
+			</article>
+
+			<article class="mt-8">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+					<h3 class="font-pixel text-xs leading-relaxed text-white">
+						Manager of Digital Marketing and Web Dev, ShipLilly
+					</h3>
+					<p class="text-sm text-ink-dim">2014 – 2016</p>
+				</div>
+				<p class="mt-3 text-sm leading-relaxed text-ink-dim">
+					Founded the company's first internal web marketing department and generated
+					$600,000 in new annual revenue through the website, landing pages, and
+					email campaigns I designed, built, and optimized.
+				</p>
+			</article>
+
+			<article class="mt-8">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+					<h3 class="font-pixel text-xs leading-relaxed text-white">
+						SEO Director, Exults
+					</h3>
+					<p class="text-sm text-ink-dim">2009 – 2014</p>
+				</div>
+				<p class="mt-3 text-sm leading-relaxed text-ink-dim">
+					Directed organic search strategy for over 100 clients, grew and mentored
+					the SEO team, and served as the department's lead technical resource,
+					implementing client site changes in HTML, CSS, JavaScript, and PHP.
+				</p>
+			</article>
+		</section>
+
+		<!-- Skills -->
+		<section aria-labelledby="skills-heading" class="border-t-2 border-grid py-16">
+			<h2
+				id="skills-heading"
+				class="text-anaglyph-sm font-pixel text-base leading-relaxed text-white sm:text-lg"
+			>
+				<span class="text-cyan3d">&gt;</span> Skills
+			</h2>
+			<div class="mt-10 space-y-8">
+				{
+					skillGroups.map((group) => (
+						<div>
+							<h3 class="font-pixel text-[10px] tracking-wider text-ink-dim uppercase">
+								{group.name}
+							</h3>
+							<ul class="mt-4 flex flex-wrap gap-2">
+								{group.skills.map((skill) => (
+									<li class="border-2 border-grid bg-panel px-3 py-1 text-sm">
+										{skill}
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+			</div>
+		</section>
+
+		<!-- Contact -->
+		<section aria-labelledby="contact-heading" class="border-t-2 border-grid py-16">
+			<h2
+				id="contact-heading"
+				class="text-anaglyph-sm font-pixel text-base leading-relaxed text-white sm:text-lg"
+			>
+				<span class="text-cyan3d">&gt;</span> Get in touch
+			</h2>
+			<p class="mt-6 max-w-2xl leading-relaxed text-ink-dim">
+				I am open to remote roles and to hybrid roles within driving distance of
+				Ann Arbor, Michigan. The fastest way to reach me is email.
+			</p>
+			<div class="mt-8">
+				<a
+					href="mailto:pdipatrizio@gmail.com"
+					class="shadow-anaglyph-sm inline-block border-2 border-white bg-cyan3d px-5 py-3 text-sm font-bold text-crt transition hover:translate-y-0.5 hover:bg-white"
+				>
+					pdipatrizio@gmail.com
+				</a>
+			</div>
+		</section>
+
+		<footer class="border-t-2 border-grid py-10 text-sm text-ink-dim">
+			<p>
+				Built with Astro and Tailwind.
+			</p>
+			<p class="mt-3 font-pixel text-[10px]">© 2026 Philip DiPatrizio</p>
+		</footer>
+	</main>
+</Layout>

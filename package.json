@@ -12,6 +12,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.0.6"
+    "@fontsource/press-start-2p": "^5.2.7",
+    "@tailwindcss/vite": "^4.3.2",
+    "astro": "^7.0.6",
+    "tailwindcss": "^4.3.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.107.1"
   }
 }

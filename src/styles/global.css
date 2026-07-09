@@ -1,0 +1,77 @@
+@import '@fontsource/press-start-2p/latin.css';
+@import 'tailwindcss';
+
+@theme {
+	--font-pixel: 'Press Start 2P', 'Courier New', monospace;
+	--font-mono:
+		ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+	--color-crt: #0a0a14;
+	--color-panel: #12121f;
+	--color-grid: #2a2a40;
+	--color-ink: #d8d8e8;
+	--color-ink-dim: #8f8fa8;
+	--color-red3d: #ff3355;
+	--color-cyan3d: #00e5ff;
+}
+
+/* Anaglyph 3D: the same shape duplicated on a purely horizontal
+   offset in red and cyan, like a stereo image without the glasses. */
+@utility text-anaglyph {
+	text-shadow:
+		-0.08em 0 0 var(--color-red3d),
+		0.08em 0 0 var(--color-cyan3d);
+}
+
+@utility text-anaglyph-sm {
+	text-shadow:
+		-0.05em 0 0 color-mix(in srgb, var(--color-red3d) 70%, transparent),
+		0.05em 0 0 color-mix(in srgb, var(--color-cyan3d) 70%, transparent);
+}
+
+@utility shadow-anaglyph {
+	box-shadow:
+		-6px 0 0 0 var(--color-red3d),
+		6px 0 0 0 var(--color-cyan3d);
+}
+
+@utility shadow-anaglyph-sm {
+	box-shadow:
+		-3px 0 0 0 var(--color-red3d),
+		3px 0 0 0 var(--color-cyan3d);
+}
+
+@layer base {
+	::selection {
+		background: var(--color-cyan3d);
+		color: var(--color-crt);
+	}
+
+	/* CRT scanlines over everything, cheap and non-interactive */
+	body::after {
+		content: '';
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		pointer-events: none;
+	}
+}
+
+@keyframes blink {
+	0%,
+	49% {
+		opacity: 1;
+	}
+	50%,
+	100% {
+		opacity: 0;
+	}
+}
+
+@utility animate-blink {
+	animation: blink 1.1s step-end infinite;
+
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+	}
+}

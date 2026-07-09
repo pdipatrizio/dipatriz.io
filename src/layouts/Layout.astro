@@ -1,0 +1,57 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+
+const personSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: 'Philip DiPatrizio',
+	jobTitle: 'Web Developer',
+	email: 'mailto:pdipatrizio@gmail.com',
+	url: 'https://dipatriz.io',
+	address: {
+		'@type': 'PostalAddress',
+		addressLocality: 'Ann Arbor',
+		addressRegion: 'MI',
+		addressCountry: 'US',
+	},
+	sameAs: ['https://www.linkedin.com/in/philipdipatrizio'],
+	knowsAbout: [
+		'Web performance',
+		'PHP',
+		'Laravel',
+		'Statamic',
+		'JavaScript',
+		'Tailwind CSS',
+		'Google Analytics 4',
+		'Technical SEO',
+		'Conversion rate optimization',
+	],
+};
+---
+
+<html lang="en" class="scroll-smooth">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://dipatriz.io" />
+		<meta name="theme-color" content="#0a0a14" />
+		<script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+	</head>
+	<body class="bg-crt font-mono text-ink antialiased">
+		<slot />
+	</body>
+</html>
