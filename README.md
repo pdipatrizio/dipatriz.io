@@ -20,7 +20,3 @@ A retro 8-bit anaglyph 3D take on a developer portfolio. Pixel type, red and cya
 | `npm run dev`     | Dev server at `localhost:4321`            |
 | `npm run build`   | Production build to `./dist/`             |
 | `npm run preview` | Preview the production build locally      |
-
-## Built with Claude Code
-
-This site was designed and built in pair with [Claude Code](https://claude.com/claude-code). The commit history is the honest record of that workflow.
