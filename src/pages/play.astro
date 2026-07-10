@@ -1,0 +1,482 @@
+---
+import '../styles/global.css';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+		/>
+		<meta name="robots" content="noindex" />
+		<title>Skill Breaker | Philip DiPatrizio</title>
+		<meta
+			name="description"
+			content="A hidden retro game by Philip DiPatrizio. You found it."
+		/>
+		<meta name="theme-color" content="#0a0a14" />
+	</head>
+	<body
+		class="bg-crt flex h-dvh items-center justify-center overflow-hidden overscroll-none font-mono text-ink"
+	>
+		<canvas id="game" class="border-grid block touch-none border-2 select-none"></canvas>
+		<a
+			href="https://dipatriz.io/"
+			class="font-pixel text-ink-dim hover:text-cyan3d fixed top-3 left-1/2 -translate-x-1/2 text-[8px] transition"
+		>
+			DIPATRIZ.IO
+		</a>
+
+		<script>
+			import { brickLabels } from '../data/skills';
+
+			const canvas = document.getElementById('game') as HTMLCanvasElement;
+			const ctx = canvas.getContext('2d')!;
+
+			const C = {
+				bg: '#0a0a14',
+				panel: '#12121f',
+				grid: '#2a2a40',
+				ink: '#d8d8e8',
+				dim: '#8f8fa8',
+				red: '#ff3355',
+				cyan: '#00e5ff',
+				white: '#ffffff',
+			};
+			const FONT = '"Press Start 2P"';
+			const coarse = matchMedia('(pointer: coarse)').matches;
+
+			// The playfield is a portrait area like a phone screen. Every length in
+			// the game is a base value times S, the pixel scale. S is 2 wherever the
+			// window has room for it (the size the game is designed to play at) and
+			// 1 on small screens like actual phones.
+			//
+			// Press Start 2P draws glyphs on an 8px grid, so font sizes must be
+			// multiples of 4 to land on whole hardware pixels at 2x displays.
+			// Anything else antialiases inside the glyphs and looks fuzzy. Both
+			// scales keep every size on that grid.
+			const BASE_W = 430;
+			const BASE_H = 780;
+
+			interface Brick {
+				x: number;
+				y: number;
+				w: number;
+				h: number;
+				label: string;
+				alive: boolean;
+			}
+			interface Flash {
+				x: number;
+				y: number;
+				w: number;
+				h: number;
+				life: number;
+			}
+
+			let S = 1;
+			let W = 0;
+			let H = 0;
+			let fieldLeft = 0;
+			let brickFont = 8;
+			let bricks: Brick[] = [];
+			let bricksBottom = 0;
+			let flashes: Flash[] = [];
+			const paddle = { x: 0, y: 0, w: 84, h: 10 };
+			const ball = { x: 0, y: 0, vx: 0, vy: 0, half: 5 };
+			let speed = 0;
+			let score = 0;
+			let lives = 3;
+			let state: 'ready' | 'playing' | 'over' | 'won' = 'ready';
+			let stateAt = 0;
+			const keys = { left: false, right: false };
+
+			// Speed scales with the field so the ball crosses it in the same time
+			// at any size. Sizing off height alone made the wide 2x field feel slow.
+			const baseSpeed = () => Math.max(280 * S, Math.min(W * 0.9, H * 0.85));
+			const clamp = (v: number, lo: number, hi: number) =>
+				Math.min(Math.max(v, lo), hi);
+
+			function setState(next: typeof state) {
+				state = next;
+				stateAt = performance.now();
+			}
+
+			function layoutBricks() {
+				brickFont = 8 * S;
+				const chipH = 20 * S;
+				const gap = 5 * S;
+				const padX = 6 * S;
+				const margin = 10 * S;
+				const maxW = W - margin * 2;
+				ctx.font = `${brickFont}px ${FONT}`;
+
+				type Chip = { label: string; w: number };
+				const rows: Chip[][] = [];
+				let row: Chip[] = [];
+				let rowW = 0;
+				for (const label of brickLabels) {
+					const w = Math.min(ctx.measureText(label).width + padX * 2, maxW);
+					const needed = row.length ? rowW + gap + w : w;
+					if (row.length && needed > maxW) {
+						rows.push(row);
+						row = [];
+						rowW = w;
+					} else {
+						rowW = needed;
+					}
+					row.push({ label, w: Math.ceil(w) });
+				}
+				if (row.length) rows.push(row);
+
+				bricks = [];
+				const top = 44 * S;
+				rows.forEach((chips, i) => {
+					const totalW =
+						chips.reduce((sum, c) => sum + c.w, 0) + gap * (chips.length - 1);
+					// Integer coordinates keep the pixel font crisp.
+					let x = Math.round((W - totalW) / 2);
+					const y = top + i * (chipH + gap);
+					for (const c of chips) {
+						bricks.push({ x, y, w: c.w, h: chipH, label: c.label, alive: true });
+						x += c.w + gap;
+					}
+				});
+				bricksBottom = top + rows.length * (chipH + gap);
+			}
+
+			function resize() {
+				const dpr = devicePixelRatio || 1;
+				S = innerWidth >= 640 && innerHeight >= 700 ? 2 : 1;
+				W = Math.min(innerWidth, BASE_W * S);
+				H = Math.min(innerHeight, BASE_H * S);
+				canvas.style.width = `${W}px`;
+				canvas.style.height = `${H}px`;
+				canvas.width = Math.round(W * dpr);
+				canvas.height = Math.round(H * dpr);
+				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+				fieldLeft = canvas.getBoundingClientRect().left;
+
+				paddle.w = Math.max(64 * S, Math.min(W * 0.2, 96 * S));
+				paddle.h = 10 * S;
+				paddle.y = H - (coarse ? 76 : 52) * S;
+				ball.half = 5 * S;
+				const alive = bricks.map((b) => b.alive);
+				layoutBricks();
+				if (alive.length === bricks.length) {
+					bricks.forEach((b, i) => (b.alive = alive[i]));
+				}
+				paddle.x = clamp(paddle.x, 0, W - paddle.w);
+				ball.x = clamp(ball.x, ball.half, W - ball.half);
+				ball.y = clamp(ball.y, ball.half, paddle.y);
+
+				// Re-fit the ball speed to the resized field, keeping its direction.
+				speed = clamp(speed, baseSpeed(), baseSpeed() * 1.55);
+				const mag = Math.hypot(ball.vx, ball.vy);
+				if (mag > 0) {
+					ball.vx = (ball.vx / mag) * speed;
+					ball.vy = (ball.vy / mag) * speed;
+				}
+			}
+
+			function stickBall() {
+				ball.x = paddle.x + paddle.w / 2;
+				ball.y = paddle.y - ball.half - 1;
+				ball.vx = 0;
+				ball.vy = 0;
+			}
+
+			function resetGame() {
+				score = 0;
+				lives = 3;
+				speed = baseSpeed();
+				flashes = [];
+				bricks.forEach((b) => (b.alive = true));
+				paddle.x = (W - paddle.w) / 2;
+				setState('ready');
+				stickBall();
+			}
+
+			function launch() {
+				const a = ((Math.random() * 40 - 20) * Math.PI) / 180;
+				ball.vx = speed * Math.sin(a);
+				ball.vy = -speed * Math.cos(a);
+				setState('playing');
+			}
+
+			function loseLife() {
+				lives -= 1;
+				if (lives <= 0) {
+					setState('over');
+				} else {
+					setState('ready');
+					stickBall();
+				}
+			}
+
+			function collide() {
+				const h = ball.half;
+				if (ball.x < h) {
+					ball.x = h;
+					ball.vx = Math.abs(ball.vx);
+				}
+				if (ball.x > W - h) {
+					ball.x = W - h;
+					ball.vx = -Math.abs(ball.vx);
+				}
+				if (ball.y < h) {
+					ball.y = h;
+					ball.vy = Math.abs(ball.vy);
+				}
+				if (ball.y - h > H) {
+					loseLife();
+					return;
+				}
+
+				if (
+					ball.vy > 0 &&
+					ball.y + h >= paddle.y &&
+					ball.y - h <= paddle.y + paddle.h &&
+					ball.x + h >= paddle.x &&
+					ball.x - h <= paddle.x + paddle.w
+				) {
+					const rel = clamp(
+						(ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2),
+						-1,
+						1,
+					);
+					const a = rel * ((60 * Math.PI) / 180);
+					ball.vx = speed * Math.sin(a);
+					ball.vy = -speed * Math.cos(a);
+					ball.y = paddle.y - h - 0.5;
+				}
+
+				for (const b of bricks) {
+					if (!b.alive) continue;
+					if (
+						ball.x + h < b.x ||
+						ball.x - h > b.x + b.w ||
+						ball.y + h < b.y ||
+						ball.y - h > b.y + b.h
+					) {
+						continue;
+					}
+					b.alive = false;
+					score += 100;
+					flashes.push({ x: b.x, y: b.y, w: b.w, h: b.h, life: 0.18 });
+					speed = Math.min(speed * 1.012, baseSpeed() * 1.55);
+
+					const overlapX = Math.min(ball.x + h - b.x, b.x + b.w - (ball.x - h));
+					const overlapY = Math.min(ball.y + h - b.y, b.y + b.h - (ball.y - h));
+					if (overlapX < overlapY) {
+						ball.vx = ball.x < b.x + b.w / 2 ? -Math.abs(ball.vx) : Math.abs(ball.vx);
+					} else {
+						ball.vy = ball.y < b.y + b.h / 2 ? -Math.abs(ball.vy) : Math.abs(ball.vy);
+					}
+					const mag = Math.hypot(ball.vx, ball.vy) || 1;
+					ball.vx = (ball.vx / mag) * speed;
+					ball.vy = (ball.vy / mag) * speed;
+
+					if (bricks.every((brick) => !brick.alive)) setState('won');
+					break;
+				}
+			}
+
+			function stepBall(dt: number) {
+				// Substep so a fast ball can't tunnel through a thin brick or the paddle.
+				const dist = Math.hypot(ball.vx, ball.vy) * dt;
+				const steps = Math.max(1, Math.ceil(dist / (6 * S)));
+				for (let i = 0; i < steps; i++) {
+					ball.x += (ball.vx * dt) / steps;
+					ball.y += (ball.vy * dt) / steps;
+					collide();
+					if (state !== 'playing') break;
+				}
+			}
+
+			function update(dt: number) {
+				const move = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+				if (move) paddle.x = clamp(paddle.x + move * 460 * S * dt, 0, W - paddle.w);
+				if (state === 'ready') stickBall();
+				if (state === 'playing') stepBall(dt);
+				flashes = flashes.filter((f) => (f.life -= dt) > 0);
+			}
+
+			function drawTitle(text: string, y: number) {
+				let size = 24 * S;
+				ctx.font = `${size}px ${FONT}`;
+				while (size > 8 * S && ctx.measureText(text).width > W - 24 * S) {
+					size -= 4 * S;
+					ctx.font = `${size}px ${FONT}`;
+				}
+				const offset = Math.max(S, Math.round(size * 0.08));
+				const cx = Math.round(W / 2);
+				const cy = Math.round(y);
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillStyle = C.red;
+				ctx.fillText(text, cx - offset, cy);
+				ctx.fillStyle = C.cyan;
+				ctx.fillText(text, cx + offset, cy);
+				ctx.fillStyle = C.white;
+				ctx.fillText(text, cx, cy);
+			}
+
+			function draw() {
+				ctx.fillStyle = C.bg;
+				ctx.fillRect(0, 0, W, H);
+
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.font = `${brickFont}px ${FONT}`;
+				for (const b of bricks) {
+					if (!b.alive) continue;
+					ctx.fillStyle = C.panel;
+					ctx.fillRect(b.x, b.y, b.w, b.h);
+					ctx.strokeStyle = C.grid;
+					ctx.lineWidth = 2 * S;
+					ctx.strokeRect(b.x + S, b.y + S, b.w - 2 * S, b.h - 2 * S);
+					ctx.fillStyle = C.ink;
+					ctx.fillText(
+						b.label,
+						Math.round(b.x + b.w / 2),
+						Math.round(b.y + b.h / 2) + S,
+						b.w - 4 * S,
+					);
+				}
+
+				for (const f of flashes) {
+					ctx.globalAlpha = f.life / 0.18;
+					ctx.fillStyle = C.cyan;
+					ctx.fillRect(f.x, f.y, f.w, f.h);
+				}
+				ctx.globalAlpha = 1;
+
+				const px = Math.round(paddle.x);
+				ctx.fillStyle = C.red;
+				ctx.fillRect(px - 3 * S, paddle.y, paddle.w, paddle.h);
+				ctx.fillStyle = C.cyan;
+				ctx.fillRect(px + 3 * S, paddle.y, paddle.w, paddle.h);
+				ctx.fillStyle = C.white;
+				ctx.fillRect(px, paddle.y, paddle.w, paddle.h);
+
+				ctx.fillStyle = C.cyan;
+				ctx.fillRect(
+					Math.round(ball.x - ball.half),
+					Math.round(ball.y - ball.half),
+					ball.half * 2,
+					ball.half * 2,
+				);
+
+				ctx.font = `${12 * S}px ${FONT}`;
+				ctx.textAlign = 'left';
+				ctx.fillStyle = C.dim;
+				ctx.fillText(`SCORE ${String(score).padStart(4, '0')}`, 12 * S, 24 * S);
+				ctx.fillStyle = C.cyan;
+				for (let i = 0; i < lives; i++) {
+					ctx.fillRect(W - (24 + i * 18) * S, 12 * S, 12 * S, 12 * S);
+				}
+
+				const blink = performance.now() % 1100 < 550;
+
+				if (state === 'ready') {
+					const midY = Math.round(
+						Math.min((bricksBottom + paddle.y) / 2, paddle.y - 70 * S),
+					);
+					const cx = Math.round(W / 2);
+					drawTitle('SKILL BREAKER', midY - 26 * S);
+					ctx.textAlign = 'center';
+					if (blink) {
+						ctx.font = `${12 * S}px ${FONT}`;
+						ctx.fillStyle = C.ink;
+						ctx.fillText(
+							coarse ? 'TAP TO LAUNCH' : 'CLICK TO LAUNCH',
+							cx,
+							midY + 16 * S,
+						);
+					}
+					ctx.font = `${8 * S}px ${FONT}`;
+					ctx.fillStyle = C.dim;
+					ctx.fillText(
+						coarse ? 'DRAG TO MOVE' : 'MOVE WITH MOUSE OR ARROWS',
+						cx,
+						midY + 42 * S,
+					);
+				}
+
+				if (state === 'over' || state === 'won') {
+					const cx = Math.round(W / 2);
+					const cy = Math.round(H / 2);
+					ctx.fillStyle = 'rgba(10, 10, 20, 0.85)';
+					ctx.fillRect(0, 0, W, H);
+					drawTitle(state === 'won' ? 'ALL SKILLS ACQUIRED' : 'GAME OVER', cy - 36 * S);
+					ctx.font = `${12 * S}px ${FONT}`;
+					ctx.textAlign = 'center';
+					ctx.fillStyle = C.ink;
+					ctx.fillText(`SCORE ${String(score).padStart(4, '0')}`, cx, cy + 8 * S);
+					if (blink) {
+						ctx.fillStyle = C.cyan;
+						ctx.fillText(
+							coarse ? 'TAP TO PLAY AGAIN' : 'CLICK TO PLAY AGAIN',
+							cx,
+							cy + 38 * S,
+						);
+					}
+				}
+			}
+
+			function movePaddle(clientX: number) {
+				paddle.x = clamp(clientX - fieldLeft - paddle.w / 2, 0, W - paddle.w);
+			}
+
+			function press() {
+				if (state === 'ready') {
+					launch();
+				} else if (
+					(state === 'over' || state === 'won') &&
+					performance.now() - stateAt > 600
+				) {
+					resetGame();
+				}
+			}
+
+			addEventListener('pointermove', (e) => movePaddle(e.clientX));
+			canvas.addEventListener('pointerdown', (e) => {
+				movePaddle(e.clientX);
+				press();
+			});
+			addEventListener('keydown', (e) => {
+				if (e.key === 'ArrowLeft') keys.left = true;
+				if (e.key === 'ArrowRight') keys.right = true;
+				if (e.key === ' ' || e.key === 'Enter') {
+					e.preventDefault();
+					press();
+				}
+				if (e.key === 'Escape') location.href = 'https://dipatriz.io/';
+			});
+			addEventListener('keyup', (e) => {
+				if (e.key === 'ArrowLeft') keys.left = false;
+				if (e.key === 'ArrowRight') keys.right = false;
+			});
+			addEventListener('resize', resize);
+
+			let last = performance.now();
+			function frame(t: number) {
+				const dt = Math.min((t - last) / 1000, 0.033);
+				last = t;
+				update(dt);
+				draw();
+				requestAnimationFrame(frame);
+			}
+
+			// Brick widths come from measureText, so wait for the pixel font.
+			document.fonts.load(`8px ${FONT}`).finally(() => {
+				resize();
+				resetGame();
+				requestAnimationFrame(frame);
+			});
+		</script>
+	</body>
+</html>

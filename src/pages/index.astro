@@ -1,81 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-const skillGroups = [
-	{
-		name: 'Languages and frameworks',
-		skills: [
-			'PHP',
-			'Laravel',
-			'JavaScript',
-			'Alpine.js',
-			'HTML',
-			'CSS',
-			'Tailwind CSS',
-			'SQL',
-			'Python',
-			'PyQt',
-		],
-	},
-	{
-		name: 'CMS and e-commerce',
-		skills: [
-			'Statamic',
-			'WordPress custom plugins and themes',
-			'WooCommerce',
-			'Content modeling',
-		],
-	},
-	{
-		name: 'Performance',
-		skills: [
-			'Core Web Vitals',
-			'LCP optimization',
-			'Lazy loading',
-			'Third party script deferral',
-			'Caching strategies',
-			'Server migrations',
-			'PageSpeed Insights',
-		],
-	},
-	{
-		name: 'Analytics and attribution',
-		skills: [
-			'GA4 custom events and reports',
-			'Full GTM container builds',
-			'First touch attribution',
-			'Salesforce integration',
-			'A/B testing with VWO and Optimizely',
-			'CRO',
-		],
-	},
-	{
-		name: 'Technical SEO',
-		skills: [
-			'JSON-LD structured data',
-			'XML sitemaps',
-			'Canonical URLs',
-			'301 redirect strategy',
-			'Crawlability and indexation',
-		],
-	},
-	{
-		name: 'Tools and practices',
-		skills: [
-			'Git',
-			'Vite',
-			'Webpack',
-			'Jenkins CI',
-			'AWS S3',
-			'MySQL',
-			'Figma',
-			'BrowserStack',
-			'Test driven development',
-			'Paired programming',
-			'AI assisted development with Claude Code and Cursor',
-		],
-	},
-];
+import { skillGroups } from '../data/skills';
 ---
 
 <Layout
@@ -95,7 +20,8 @@ const skillGroups = [
 			</h1>
 			<p class="mt-4 text-lg font-bold">
 				Senior web developer who owns the outcome.<span
-					class="animate-blink text-cyan3d">▮</span
+					id="hero-cursor"
+					class="animate-blink text-cyan3d inline-block cursor-pointer p-3 -m-3 select-none touch-manipulation">▮</span
 				>
 			</p>
 			<p class="mt-6 max-w-2xl leading-relaxed text-ink-dim">
@@ -406,3 +332,45 @@ const skillGroups = [
 		</footer>
 	</main>
 </Layout>
+
+<script>
+	// Easter egg: five quick taps on the blinking cursor, or the Konami
+	// code, opens Skill Breaker at philip.dipatriz.io.
+	const playUrl =
+		location.hostname === 'dipatriz.io' || location.hostname === 'www.dipatriz.io'
+			? 'https://philip.dipatriz.io/'
+			: '/play/';
+
+	const cursor = document.getElementById('hero-cursor');
+	let taps = 0;
+	let tapTimer: number | undefined;
+	cursor?.addEventListener('click', () => {
+		taps += 1;
+		clearTimeout(tapTimer);
+		tapTimer = setTimeout(() => (taps = 0), 1200);
+		cursor.animate(
+			[{ transform: 'scale(1)' }, { transform: 'scale(1.35)' }, { transform: 'scale(1)' }],
+			{ duration: 140 },
+		);
+		if (taps >= 5) location.href = playUrl;
+	});
+
+	const konami = [
+		'arrowup',
+		'arrowup',
+		'arrowdown',
+		'arrowdown',
+		'arrowleft',
+		'arrowright',
+		'arrowleft',
+		'arrowright',
+		'b',
+		'a',
+	];
+	let progress = 0;
+	addEventListener('keydown', (e) => {
+		const key = e.key.toLowerCase();
+		progress = key === konami[progress] ? progress + 1 : key === konami[0] ? 1 : 0;
+		if (progress === konami.length) location.href = playUrl;
+	});
+</script>
