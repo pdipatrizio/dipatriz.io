@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 ---
 
@@ -11,6 +12,7 @@ import '../styles/global.css';
 			content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
 		/>
 		<meta name="robots" content="noindex" />
+		<Font cssVariable="--font-press-start-2p" preload />
 		<title>Skill Breaker | Philip DiPatrizio</title>
 		<meta
 			name="description"
@@ -45,7 +47,11 @@ import '../styles/global.css';
 				cyan: '#00e5ff',
 				white: '#ffffff',
 			};
-			const FONT = '"Press Start 2P"';
+			// Astro's Fonts API registers the family under a hashed name, so the
+			// canvas has to read the real family list from the CSS variable.
+			const FONT = getComputedStyle(document.documentElement)
+				.getPropertyValue('--font-press-start-2p')
+				.trim();
 			const coarse = matchMedia('(pointer: coarse)').matches;
 
 			// The playfield is a portrait area like a phone screen. Every length in

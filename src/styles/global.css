@@ -1,8 +1,10 @@
-@import '@fontsource/press-start-2p/latin.css';
 @import 'tailwindcss';
 
+@theme inline {
+	--font-pixel: var(--font-press-start-2p);
+}
+
 @theme {
-	--font-pixel: 'Press Start 2P', 'Courier New', monospace;
 	--font-mono:
 		ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
