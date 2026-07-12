@@ -1,0 +1,23 @@
+# Philip DiPatrizio
+
+> Portfolio of Philip DiPatrizio, a senior web developer in Ann Arbor, Michigan. He builds and runs websites end to end, with a specialty in web performance backed by measured PageSpeed turnarounds, plus career-long depth in analytics, technical SEO, and conversion optimization.
+
+Philip is open to remote roles and to hybrid roles within driving distance of Ann Arbor, Michigan. The fastest way to reach him is email at pdipatrizio@gmail.com.
+
+Highlights from his experience:
+
+- Senior Web Developer at Raken (2022 to 2025). Sole developer and owner of rakenapp.com, a custom Laravel and Statamic application, with over 1,100 commits across three years. Built a component based page builder of about 30 reusable blocks, raised mobile PageSpeed scores sitewide from the 20s to the 90s, ran a conversion optimization program with VWO, and architected the full GA4, Google Tag Manager, and Salesforce attribution setup.
+- Software Developer at Menlo Innovations (2026). Paired on CAVA, a NASA funded desktop application for the IMAP mission, practicing test driven development and paired programming in Python and PyQt, including a paired 8x rendering speedup.
+- Earlier roles spanning full stack WordPress and WooCommerce engineering at Backyard Products, agency partnership at Digital Engine, and digital marketing and web development leadership at Forward Thinking Systems, ShipLilly, and Exults.
+
+Core skills include PHP, Laravel, JavaScript, Tailwind CSS, Statamic, WordPress, Core Web Vitals and LCP optimization, GA4 and GTM, technical SEO, A/B testing, and AI assisted development with Claude Code.
+
+## Pages
+
+- [Home](https://dipatriz.io/): Full resume style portfolio with experience, skills, and contact details
+- [Skill Breaker](https://philip.dipatriz.io/): A playable brick breaker game where the bricks are Philip's skills
+
+## Contact
+
+- [Email](mailto:pdipatrizio@gmail.com): Preferred contact method
+- [LinkedIn](https://www.linkedin.com/in/philipdipatrizio): Professional profile
